@@ -133,6 +133,33 @@ objetos.forEach((objeto) => {
                 <button onclick="comprarObjeto(${objeto.id})">Adquirir objeto por ${objeto.precio} de Oro</button>`;
     contenedorObjetos.appendChild(div);
 });
+//
+// Obtener referencia al contenedor de estadísticas
+const contenedorEstadisticas = document.getElementById("contenedorEstadisticas");
+mostrarEstadisticas();
+function mostrarEstadisticas() {
+contenedorEstadisticas.appendChild(nombreUsuario);
+contenedorEstadisticas.appendChild(nivelUsuario);
+contenedorEstadisticas.appendChild(balanceOroUsuario);
+contenedorEstadisticas.appendChild(capacidadInventarioUsuario);
+}
+//Funcion para mostrar las estadisticas del usuario.
+function mostrarEstadisticas() {
+    const contenedorEstadisticas = document.getElementById("contenedorEstadisticas");
+    contenedorEstadisticas.innerHTML = "";
+    const nombreUsuario = document.createElement("p");
+    nombreUsuario.innerText = `Nombre: ${usuario.nombre}`;
+    contenedorEstadisticas.appendChild(nombreUsuario);
+    const nivelUsuario = document.createElement("p");
+    nivelUsuario.innerText = `Nivel: ${usuario.nivel}`;
+    contenedorEstadisticas.appendChild(nivelUsuario);
+    const balanceOroUsuario = document.createElement("p");
+    balanceOroUsuario.innerText = `Balance de Oro: ${usuario.balanceOro}`;
+    contenedorEstadisticas.appendChild(balanceOroUsuario);
+    const capacidadInventarioUsuario = document.createElement("p");
+    capacidadInventarioUsuario.innerText = `Capacidad del Inventario: ${usuario.capacidadInventario}`;
+    contenedorEstadisticas.appendChild(capacidadInventarioUsuario);
+}
 // Función para mostrar los objetos en el inventario.
 function mostrarInventario() {
     contenedorInventario.innerHTML = ""; // Limpiar el contenedor antes de mostrar los objetos
