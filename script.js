@@ -2,9 +2,27 @@
 //Aplique DOM para mostrar los elementos de forma dinamica en el documento HTML.
 header.innerText = "";
 titulo.innerText = "Tienda de las Rarezas";
+
+function inicializarModoOscuro(){
+    const modo = localStorage.getItem("modo")
+    console.log(modo)
+    if (modo !== "light"){
+        setDark()
+    }
+}
+
+const nombreInicial = localStorage.getItem("nombreUsuario")
+
+const bienvenidaUsuario = document.getElementById("bienvenidaUsuario")
+
 bienvenidaUsuario.innerText =
-    "Bienvenido a la Tienda de las Rarezas!\nDime tu nombre aventurero..";
+    `Bienvenido a la Tienda de las Rarezas!\n ${nombreInicial ? nombreInicial : `Dime tu nombre aventurero..` }`;
 //Cree una class que contiene todas las propiedades del usuario.
+
+// Valores por defecto del oro y la capacidad
+const DEFAULT_ORO = 200
+const DEFAULT_CAPACIDAD = 60
+
 class Usuario {
     constructor(nombre) {
         (this.id = 0),
@@ -15,11 +33,25 @@ class Usuario {
         (this.probabilidadCritico = 0),
         (this.defensaInicial = 0),
         (this.inventario = []),
-        (this.capacidadInventario = 60),
-        (this.balanceOro = 200);
+        (this.capacidadInventario = DEFAULT_CAPACIDAD),
+        (this.balanceOro = DEFAULT_ORO);
     }
 }
-const usuario = new Usuario("NombreUsuario");
+let usuario = new Usuario("NombreUsuario");
+inicializarInventario()
+
+
+
+// Si hay un inventario guardado en local storage, lo leemos y lo mostramos al entrar
+function inicializarInventario(){
+    let inventarioString = localStorage.getItem("inventario")
+    let inventario = JSON.parse(inventarioString)
+    if(inventarioString){
+        usuario.inventario = inventario
+    }
+    mostrarInventario()
+}
+
 //Cree una class que contiene un constructor con todas las propiedades de los objetos.
 class Objeto {
     constructor(
@@ -181,6 +213,24 @@ function mostrarInventario() {
         });
     }
 }
+
+// Guardamos inventario en local storage, transformandolo a string primero
+function guardarInventario(usuario){
+    const inventario = usuario.inventario
+    const inventarioString = JSON.stringify(inventario)
+    localStorage.setItem('inventario', inventarioString )
+}
+
+// Reseteamos el inventario a un array vacio, y el balance y capacidad a sus valores por defecto definidos antes, borramos el inventario de local storage y actualizamos estadisticas e inventario
+function borrarInventario(){
+    usuario.inventario = []
+    usuario.balanceOro = DEFAULT_ORO
+    usuario.capacidadInventario = DEFAULT_CAPACIDAD
+    localStorage.removeItem("inventario")
+    mostrarEstadisticas()
+    mostrarInventario()
+}
+
 //Funcion comprarObjeto().
 function comprarObjeto(objetoId) {
     const objeto = objetos.find((obj) => obj.id === objetoId);
@@ -204,12 +254,15 @@ function comprarObjeto(objetoId) {
         // Borrar objeto de la tienda una vez que se ejecute la funcion con exito.
         const div = document.getElementById(objeto.id);
         div.remove();
+        // Guardar estado actual del inventario a local storage
+        guardarInventario(usuario)
         // Agregue la funcion mostrarInventario(), para que actualice al usuario sobre el contenido del inventario.
         mostrarInventario();
         // Agregue la funcion mostrarEstadisticas(), para que actualice las estadisticas del usuario.
         mostrarEstadisticas()
     }
 }
+
 //Modo nocturno con localStorage.
 const botonDark = document.getElementById("btnfondo");
 const setDark = () => document.body.classList.toggle("dark");
@@ -221,3 +274,25 @@ botonDark.addEventListener("click", () => {
         localStorage.setItem("modo", "light");
     }
 });
+inicializarModoOscuro()
+
+const guardarNombre = (event) => { 
+    // Prevenimos que la pagina se actualize al submitear el form
+    event.preventDefault()
+
+    // Obteniendo el nombre directamente del input del dom
+    const input = document.getElementById('inputNombre')
+    const nombre = input.value
+
+
+    // Obteniendo el nombre creando FormData desde el formulario
+    // const form = event.target
+    // const data = new FormData(form)
+    // const nombre = data.get("nombre")
+
+    // Guardamos el nombre en local storage y actualizamos el mensaje de bienvenida
+    localStorage.setItem("nombreUsuario", nombre)
+    bienvenidaUsuario.innerText = `Bienvenido a la Tienda de las Rarezas!\n ${nombre}`;
+}
+
+
