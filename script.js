@@ -1,6 +1,6 @@
 //Simulador de Tienda de Objetos MMORPG "Tienda de las Rarezas"
 //Aplique DOM para mostrar los elementos de forma dinamica en el documento HTML.
-header.innerText = ""; //En el header me gustaria agregar un nav, que muestre las propiedades del usuario (nombre del usuario, nivel, balance de oro y espacio del inventario).
+header.innerText = "";
 titulo.innerText = "Tienda de las Rarezas";
 bienvenidaUsuario.innerText =
     "Bienvenido a la Tienda de las Rarezas!\nDime tu nombre aventurero..";
@@ -112,8 +112,8 @@ const hombrerasDeLaMontaña = new Objeto(
     "Resistencia férrea: cuando tengas menos del 10% de salud, aumentara considerablemente la resistencia del personaje a ataques físicos.",
     35,
     120
-    //Cree el array objetos[].
 );
+//Cree el array objetos=[].
 const objetos = [
     latigodelDruida,
     mantoDeHojas,
@@ -133,22 +133,21 @@ objetos.forEach((objeto) => {
                 <button onclick="comprarObjeto(${objeto.id})">Adquirir objeto por ${objeto.precio} de Oro</button>`;
     contenedorObjetos.appendChild(div);
 });
-//
-// Obtener referencia al contenedor de estadísticas
+//Cree un contenedor que muestra las estadisticas del usuario de forma dinamica en el documento HTML.
 const contenedorEstadisticas = document.getElementById("contenedorEstadisticas");
 mostrarEstadisticas();
+
 function mostrarEstadisticas() {
-contenedorEstadisticas.appendChild(nombreUsuario);
-contenedorEstadisticas.appendChild(nivelUsuario);
-contenedorEstadisticas.appendChild(balanceOroUsuario);
-contenedorEstadisticas.appendChild(capacidadInventarioUsuario);
-}
-//Funcion para mostrar las estadisticas del usuario.
+    contenedorEstadisticas.appendChild(nombreUsuario);
+    contenedorEstadisticas.appendChild(nivelUsuario);
+    contenedorEstadisticas.appendChild(balanceOroUsuario);
+    contenedorEstadisticas.appendChild(capacidadInventarioUsuario);
+} //Funcion para mostrar las estadisticas del usuario.
 function mostrarEstadisticas() {
     const contenedorEstadisticas = document.getElementById("contenedorEstadisticas");
     contenedorEstadisticas.innerHTML = "";
     const nombreUsuario = document.createElement("p");
-    nombreUsuario.innerText = `Nombre: ${usuario.nombre}`;
+    nombreUsuario.innerText = `${usuario.nombre}`;
     contenedorEstadisticas.appendChild(nombreUsuario);
     const nivelUsuario = document.createElement("p");
     nivelUsuario.innerText = `Nivel: ${usuario.nivel}`;
@@ -162,9 +161,9 @@ function mostrarEstadisticas() {
 }
 // Función para mostrar los objetos en el inventario.
 function mostrarInventario() {
-    contenedorInventario.innerHTML = ""; // Limpiar el contenedor antes de mostrar los objetos
+    contenedorInventario.innerHTML = "";
     if (usuario.inventario.length === 0) {
-        // Mostrar mensaje en caso de que el inventario esté vacío
+        // *Mostrar mensaje en caso de que el inventario esté vacío, no funciona*
         const mensaje = document.createElement("p");
         mensaje.innerText = "El inventario está vacío.";
         contenedorInventario.appendChild(mensaje);
@@ -207,6 +206,8 @@ function comprarObjeto(objetoId) {
         div.remove();
         // Agregue la funcion mostrarInventario(), para que actualice al usuario sobre el contenido del inventario.
         mostrarInventario();
+        // Agregue la funcion mostrarEstadisticas(), para que actualice las estadisticas del usuario.
+        mostrarEstadisticas()
     }
 }
 //Modo nocturno con localStorage.
