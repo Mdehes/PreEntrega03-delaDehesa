@@ -1,28 +1,33 @@
-//Simulador de Tienda de Objetos MMORPG "Tienda de las Rarezas"
-//Aplique DOM para mostrar los elementos de forma dinamica en el documento HTML.
+//////////////////////// Simulador de Tienda de Objetos MMORPG "Tienda de las Rarezas".  ////////////////////////
 header.innerText = "";
+
+//////////////////////// Bienvenida a la pagina.  ////////////////////////
+//Recopilacion de datos del usuario para almacenamiento en localStorage.
 titulo.innerText = "Tienda de las Rarezas";
-
-function inicializarModoOscuro(){
-    const modo = localStorage.getItem("modo")
-    console.log(modo)
-    if (modo !== "light"){
-        setDark()
-    }
-}
-
-const nombreInicial = localStorage.getItem("nombreUsuario")
-
 const bienvenidaUsuario = document.getElementById("bienvenidaUsuario")
-
+const nombreInicial = localStorage.getItem("nombreUsuario")
 bienvenidaUsuario.innerText =
     `Bienvenido a la Tienda de las Rarezas!\n ${nombreInicial ? nombreInicial : `Dime tu nombre aventurero..` }`;
-//Cree una class que contiene todas las propiedades del usuario.
+//Cree una constante para guardar en el nombre del usuario en localStorage.
+const guardarNombre = (event) => {
+    //Prevenimos que la pagina se actualize al ejecutar el submit del form.
+    event.preventDefault()
+    const input = document.getElementById('inputNombre')
+    const nombre = input.value
+    //Esta alternativa obtiene el nombre creando FormData desde el formulario.
+    //const form = event.target
+    //const data = new FormData(form)
+    //const nombre = data.get("nombre")
+    //Guardamos el nombre en local storage y actualizamos el mensaje de bienvenida.
+    localStorage.setItem("nombreUsuario", nombre)
+    bienvenidaUsuario.innerText = `Bienvenido a la Tienda de las Rarezas!\n ${nombre}`;
+};
 
-// Valores por defecto del oro y la capacidad
+//////////////////////// Construccion de usuario.  ////////////////////////
+//Valores por defecto.
 const DEFAULT_ORO = 200
 const DEFAULT_CAPACIDAD = 60
-
+//Cree una class que contiene todas las propiedades del usuario.
 class Usuario {
     constructor(nombre) {
         (this.id = 0),
@@ -36,22 +41,87 @@ class Usuario {
         (this.capacidadInventario = DEFAULT_CAPACIDAD),
         (this.balanceOro = DEFAULT_ORO);
     }
-}
+};
 let usuario = new Usuario("NombreUsuario");
+//Cree un contenedor que muestra los datos del usuario de forma dinamica en el documento HTML.
+const contenedorDatos = document.getElementById("contenedorDatos");
+mostrarDatos();
+function mostrarDatos() {
+    contenedorDatos.appendChild(nombreUsuario);
+    contenedorDatos.appendChild(nivelUsuario);
+    contenedorDatos.appendChild(balanceOroUsuario);
+    contenedorDatos.appendChild(capacidadInventarioUsuario);
+};
+//Funcion para mostrar los datos del usuario.
+function mostrarDatos() {
+    const contenedorDatos = document.getElementById("contenedorDatos");
+    contenedorDatos.innerHTML = "";
+    const nombreUsuario = document.createElement("p");
+    nombreUsuario.innerText = `${usuario.nombre}`;
+    contenedorDatos.appendChild(nombreUsuario);
+    const nivelUsuario = document.createElement("p");
+    nivelUsuario.innerText = `Nivel: ${usuario.nivel}`;
+    contenedorDatos.appendChild(nivelUsuario);
+    const balanceOroUsuario = document.createElement("p");
+    balanceOroUsuario.innerText = `Balance de Oro: ${usuario.balanceOro}`;
+    contenedorDatos.appendChild(balanceOroUsuario);
+    const capacidadInventarioUsuario = document.createElement("p");
+    capacidadInventarioUsuario.innerText = `Capacidad del Inventario: ${usuario.capacidadInventario}`;
+    contenedorDatos.appendChild(capacidadInventarioUsuario);
+};
+
+//////////////////////// Construccion de Inventario.  ////////////////////////
+//Esta funcion lee y retorna si existe un Inventario previamente guardado en localStorage.
 inicializarInventario()
 
-
-
-// Si hay un inventario guardado en local storage, lo leemos y lo mostramos al entrar
-function inicializarInventario(){
+function inicializarInventario() {
     let inventarioString = localStorage.getItem("inventario")
     let inventario = JSON.parse(inventarioString)
-    if(inventarioString){
+    if (inventarioString) {
         usuario.inventario = inventario
     }
     mostrarInventario()
-}
+};
+//Función para mostrar los objetos en el inventario.
+function mostrarInventario() {
+    contenedorInventario.innerHTML = "";
+    if (usuario.inventario.length === 0) {
+        //Mostrar este mensaje en caso de que el inventario esté vacío.
+        const mensaje = document.createElement("p");
+        mensaje.innerText = "El inventario está vacío.";
+        contenedorInventario.appendChild(mensaje);
+    } else {
+        usuario.inventario.forEach((objeto) => {
+            const div = document.createElement("div");
+            div.id = objeto.id;
+            div.innerHTML = `<img src="" alt="">
+                        <p>${objeto.nombre}</p>
+                        <p>${objeto.pasiva}</p>
+                        <p>${objeto.elemento}</p>
+                        <p>${objeto.categoria}</p>
+                        <button>Equipar</button>`;
+            contenedorInventario.appendChild(div);
+        });
+    }
+};
+//Esta funcion guarda el inventario en localStorage utilizando JSON.stringify.
+function guardarInventario(usuario) {
+    const inventario = usuario.inventario
+    const inventarioString = JSON.stringify(inventario)
+    localStorage.setItem('inventario', inventarioString)
+};
+//Esta funcion borra el contenido del inventario almacenado en localStorage.
+//Actualiza las propiedades de capacidadInventario y balanceOro por los valores default.
+function borrarInventario() {
+    usuario.inventario = []
+    usuario.balanceOro = DEFAULT_ORO
+    usuario.capacidadInventario = DEFAULT_CAPACIDAD
+    localStorage.removeItem("inventario")
+    mostrarDatos()
+    mostrarInventario()
+};
 
+//////////////////////// Construccion de Tienda.  ////////////////////////
 //Cree una class que contiene un constructor con todas las propiedades de los objetos.
 class Objeto {
     constructor(
@@ -83,7 +153,7 @@ class Objeto {
         this.peso = peso;
         this.precio = precio;
     }
-}
+};
 //Construi estos objetos.
 const latigodelDruida = new Objeto(
     1,
@@ -165,72 +235,6 @@ objetos.forEach((objeto) => {
                 <button onclick="comprarObjeto(${objeto.id})">Adquirir objeto por ${objeto.precio} de Oro</button>`;
     contenedorObjetos.appendChild(div);
 });
-//Cree un contenedor que muestra las estadisticas del usuario de forma dinamica en el documento HTML.
-const contenedorEstadisticas = document.getElementById("contenedorEstadisticas");
-mostrarEstadisticas();
-
-function mostrarEstadisticas() {
-    contenedorEstadisticas.appendChild(nombreUsuario);
-    contenedorEstadisticas.appendChild(nivelUsuario);
-    contenedorEstadisticas.appendChild(balanceOroUsuario);
-    contenedorEstadisticas.appendChild(capacidadInventarioUsuario);
-} //Funcion para mostrar las estadisticas del usuario.
-function mostrarEstadisticas() {
-    const contenedorEstadisticas = document.getElementById("contenedorEstadisticas");
-    contenedorEstadisticas.innerHTML = "";
-    const nombreUsuario = document.createElement("p");
-    nombreUsuario.innerText = `${usuario.nombre}`;
-    contenedorEstadisticas.appendChild(nombreUsuario);
-    const nivelUsuario = document.createElement("p");
-    nivelUsuario.innerText = `Nivel: ${usuario.nivel}`;
-    contenedorEstadisticas.appendChild(nivelUsuario);
-    const balanceOroUsuario = document.createElement("p");
-    balanceOroUsuario.innerText = `Balance de Oro: ${usuario.balanceOro}`;
-    contenedorEstadisticas.appendChild(balanceOroUsuario);
-    const capacidadInventarioUsuario = document.createElement("p");
-    capacidadInventarioUsuario.innerText = `Capacidad del Inventario: ${usuario.capacidadInventario}`;
-    contenedorEstadisticas.appendChild(capacidadInventarioUsuario);
-}
-// Función para mostrar los objetos en el inventario.
-function mostrarInventario() {
-    contenedorInventario.innerHTML = "";
-    if (usuario.inventario.length === 0) {
-        // *Mostrar mensaje en caso de que el inventario esté vacío, no funciona*
-        const mensaje = document.createElement("p");
-        mensaje.innerText = "El inventario está vacío.";
-        contenedorInventario.appendChild(mensaje);
-    } else {
-        usuario.inventario.forEach((objeto) => {
-            const div = document.createElement("div");
-            div.id = objeto.id;
-            div.innerHTML = `<img src="" alt="">
-                        <p>${objeto.nombre}</p>
-                        <p>${objeto.pasiva}</p>
-                        <p>${objeto.elemento}</p>
-                        <p>${objeto.categoria}</p>
-                        <button>Equipar</button>`;
-            contenedorInventario.appendChild(div);
-        });
-    }
-}
-
-// Guardamos inventario en local storage, transformandolo a string primero
-function guardarInventario(usuario){
-    const inventario = usuario.inventario
-    const inventarioString = JSON.stringify(inventario)
-    localStorage.setItem('inventario', inventarioString )
-}
-
-// Reseteamos el inventario a un array vacio, y el balance y capacidad a sus valores por defecto definidos antes, borramos el inventario de local storage y actualizamos estadisticas e inventario
-function borrarInventario(){
-    usuario.inventario = []
-    usuario.balanceOro = DEFAULT_ORO
-    usuario.capacidadInventario = DEFAULT_CAPACIDAD
-    localStorage.removeItem("inventario")
-    mostrarEstadisticas()
-    mostrarInventario()
-}
-
 //Funcion comprarObjeto().
 function comprarObjeto(objetoId) {
     const objeto = objetos.find((obj) => obj.id === objetoId);
@@ -259,10 +263,11 @@ function comprarObjeto(objetoId) {
         // Agregue la funcion mostrarInventario(), para que actualice al usuario sobre el contenido del inventario.
         mostrarInventario();
         // Agregue la funcion mostrarEstadisticas(), para que actualice las estadisticas del usuario.
-        mostrarEstadisticas()
+        mostrarDatos()
     }
-}
+};
 
+//////////////////////// Modo nocturno.  ////////////////////////
 //Modo nocturno con localStorage.
 const botonDark = document.getElementById("btnfondo");
 const setDark = () => document.body.classList.toggle("dark");
@@ -274,25 +279,12 @@ botonDark.addEventListener("click", () => {
         localStorage.setItem("modo", "light");
     }
 });
+//Guardo modo de seteado.
 inicializarModoOscuro()
-
-const guardarNombre = (event) => { 
-    // Prevenimos que la pagina se actualize al submitear el form
-    event.preventDefault()
-
-    // Obteniendo el nombre directamente del input del dom
-    const input = document.getElementById('inputNombre')
-    const nombre = input.value
-
-
-    // Obteniendo el nombre creando FormData desde el formulario
-    // const form = event.target
-    // const data = new FormData(form)
-    // const nombre = data.get("nombre")
-
-    // Guardamos el nombre en local storage y actualizamos el mensaje de bienvenida
-    localStorage.setItem("nombreUsuario", nombre)
-    bienvenidaUsuario.innerText = `Bienvenido a la Tienda de las Rarezas!\n ${nombre}`;
-}
-
-
+function inicializarModoOscuro() {
+    const modo = localStorage.getItem("modo")
+    console.log(modo)
+    if (modo !== "light") {
+        setDark()
+    }
+};
